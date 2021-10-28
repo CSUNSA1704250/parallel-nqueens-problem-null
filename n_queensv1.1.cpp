@@ -61,6 +61,7 @@ void *process_1D_row(void *threadarg) {
 
 
 int main( int argc, char** argv ) {
+  
   if(argc != 2) 
   {
     std::cout << "Establezca el numero de reinas" << std::endl;
@@ -70,7 +71,7 @@ int main( int argc, char** argv ) {
   // Manejo de threads
 
   if (argv[1] == NULL) return -1;
-
+  
   long thread;
   
   
@@ -90,8 +91,8 @@ int main( int argc, char** argv ) {
       data_evaluate[i].solution = new int[cant_threads];
       data_evaluate[i].solution[0] = i;
       data_evaluate[i].col = new int[cant_threads];
-      data_evaluate[i].diag = new int[cant_threads];
-      data_evaluate[i].diag2 = new int[cant_threads];
+      data_evaluate[i].diag = new int[cant_threads*2];
+      data_evaluate[i].diag2 = new int[cant_threads*2];
       data_evaluate[i].col[i] = data_evaluate[i].diag[i] = data_evaluate[i].diag2[i+cant_threads-1] = 1;
       rc = pthread_create(&thread_handles[i], NULL, process_1D_row, (void *) (&data_evaluate[i])); //(void *)&td[i]);
       
