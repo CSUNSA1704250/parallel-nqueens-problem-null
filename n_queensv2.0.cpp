@@ -38,7 +38,9 @@ bool cmdOptionExists(char** begin, char** end, const std::string& option)
     return std::find(begin, end, option) != end;
 }
 
-vector<vector<int>> solutions;
+
+
+vector<string> solutions;
 
 void search(int y, thread_data * datos)
 {
@@ -49,7 +51,14 @@ void search(int y, thread_data * datos)
   }
   if(y == cant_threads)
   {
-    solutions.push_back(datos->solution);
+    string answer = "";
+    for (int i = 0; i < cant_threads; ++i)
+    {
+      if (i!=cant_threads-1) answer += to_string(datos->solution[i]) + " ";
+      else answer += to_string(datos->solution[i]);
+    }
+
+    solutions.push_back(answer);
     find_solution = true;
     return;
   }
@@ -161,14 +170,10 @@ int main( int argc, char* argv[]) {
    TIMERSTOP(start);
 
    cout << solutions.size() << endl;
-   /*for (int i = 0; i < solutions.size(); ++i)
+   for (int i = 0; i < solutions.size(); ++i)
    {
-      for (int j = 0; j < solutions[i].size(); ++j)
-      {
-        cout << solutions[i][j] << " ";
-      }
-      cout << endl;
-   }*/
+      cout << solutions[i] <<endl;
+   }
    pthread_exit(NULL);
 
   return 0;
