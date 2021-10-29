@@ -36,7 +36,6 @@ bool cmdOptionExists(char** begin, char** end, const std::string& option)
 }
 
 
-
 vector<string> solutions;
 
 void search(int y, vector<int> &solution, vector<bool> &col,vector<bool> &diag, vector<bool> &diag2)
@@ -72,7 +71,6 @@ void search(int y, vector<int> &solution, vector<bool> &col,vector<bool> &diag, 
 }
 
 
-
 void process_1D_row(int a) {
   vector<int> solution(cant_threads, 0);
   vector<bool> col(cant_threads, 0);
@@ -83,7 +81,6 @@ void process_1D_row(int a) {
   col[a] = diag[a] = diag2[a+cant_threads-1] = 1;
   search(1, solution, col, diag, diag2);
 }
-
 
 
 int main( int argc, char* argv[]) {
