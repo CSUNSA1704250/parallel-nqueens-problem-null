@@ -3,3 +3,16 @@
 ## Integrantes:
 ### - Victor Manuel Janampa Canahuire
 ### - Yordy Williams Santos Apaza
+
+## Requirements
+- [OpenMP](https://www.openmp.org/)
+
+## Compile
+```sh
+g++ --std c++17 n_queens.cpp -o testoutput -fopenmp
+```
+
+## Run
+```sh
+./testoutput -problemType [all, find] -N <queens>
+```
