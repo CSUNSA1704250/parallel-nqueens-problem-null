@@ -12,10 +12,7 @@
 using namespace std;
 
 struct thread_data {
-  vector<int>solution;
-  vector<int>col;
-  vector<int>diag;
-  vector<int>diag2;
+ int pos;
 };
 
 long cant_threads;
@@ -42,7 +39,7 @@ bool cmdOptionExists(char** begin, char** end, const std::string& option)
 
 vector<string> solutions;
 
-void search(int y, thread_data * datos)
+void search(int y, vector<int> &solution, vector<bool> &col,vector<bool> &diag, vector<bool> &diag2)
 {
 
   if (!todos && find_solution)
@@ -54,8 +51,8 @@ void search(int y, thread_data * datos)
     string answer = "";
     for (int i = 0; i < cant_threads; ++i)
     {
-      if (i!=cant_threads-1) answer += to_string(datos->solution[i]) + " ";
-      else answer += to_string(datos->solution[i]);
+      if (i!=cant_threads-1) answer += to_string(solution[i]) + " ";
+      else answer += to_string(solution[i]);
     }
 
     solutions.push_back(answer);
@@ -65,25 +62,26 @@ void search(int y, thread_data * datos)
 
   for(int x = 0; x < cant_threads; x++)
   {
-    if(datos->col[x] || datos->diag[x+y] || datos->diag2[x-y+cant_threads-1]) continue;
+    if(col[x] || diag[x+y] || diag2[x-y+cant_threads-1]) continue;
 
-    datos->col[x] = datos->diag[x+y] = datos->diag2[x-y+cant_threads-1] = 1;
-    datos->solution[y] = x;
-    search(y+1, datos);
-    datos->col[x] = datos->diag[x+y] = datos->diag2[x-y+cant_threads-1] = 0;
+    col[x] = diag[x+y] = diag2[x-y+cant_threads-1] = 1;
+    solution[y] = x;
+    search(y+1, solution, col, diag, diag2);
+    col[x] = diag[x+y] = diag2[x-y+cant_threads-1] = 0;
   }
 }
 
 
 
-void *process_1D_row(void *threadarg) {
-  thread_data * my_data = (thread_data * ) threadarg;
+void process_1D_row(int a) {
+  vector<int> solution(cant_threads, 0);
+  vector<bool> col(cant_threads, 0);
+  vector<bool> diag(cant_threads*2, 0);
+  vector<bool> diag2(cant_threads*2, 0);
 
-
-  search(1, my_data);
-
-  //cout << " Message : " << acumulador<< endl;
-  pthread_exit(NULL);
+  solution[0] = a;
+  col[a] = diag[a] = diag2[a+cant_threads-1] = 1;
+  search(1, solution, col, diag, diag2);
 }
 
 
@@ -107,14 +105,9 @@ int main( int argc, char* argv[]) {
 
 
   //cant_threads = 7;
-  cant_threads = stol(a);
-  pthread_t* thread_handles;
-  thread_handles = (pthread_t*)malloc(cant_threads*sizeof(pthread_t));
-  
-  vector<thread_data> data_evaluate(cant_threads);
+  cant_threads = stol(a);  
+
   int rc;
-
-
 
   if(problema == "all")
   {
@@ -131,50 +124,23 @@ int main( int argc, char* argv[]) {
   }
 
   find_solution = false;
- 
+  omp_set_num_threads(cant_threads);
   // Inicio de los threads
   TIMERSTART(start);
-  for(int i = 0; i < cant_threads; i++ ) {
-      data_evaluate[i].solution.resize(cant_threads);
-      
-      data_evaluate[i].col.resize(cant_threads);
-      data_evaluate[i].diag.resize(cant_threads*2);
-      data_evaluate[i].diag2.resize(cant_threads*2);
-      for (int j = 0; j < cant_threads; ++j)
-      {
-        data_evaluate[i].solution[j] = 0;
-        data_evaluate[i].col[j] = 0;
-        data_evaluate[i].diag[j] = 0;
-        data_evaluate[i].diag2[j] = 0;
-        data_evaluate[i].diag2[cant_threads+j] = 0;
-      }
 
-      data_evaluate[i].solution[0] = i;
-      data_evaluate[i].col[i] = data_evaluate[i].diag[i] = data_evaluate[i].diag2[i+cant_threads-1] = 1;
-      rc = pthread_create(&thread_handles[i], NULL, process_1D_row, (void *) (&data_evaluate[i])); //(void *)&td[i]);
-      
-      if (rc) {
-         cout << "Error para crear thread," << rc << endl;
-         exit(-1);
-      }
-   }
-
-   for(int i = 0; i < cant_threads; i++ ) {
-      rc = pthread_join(thread_handles[i], NULL);
-      if (rc) {
-         cout << "Error, no es posible aplicar join" << rc << endl;
-         exit(-1);
-      }
+  #pragma omp for
+    for(int i = 0; i < cant_threads; i++ ) {
+      process_1D_row(i);     
    }
 
    TIMERSTOP(start);
 
    cout << solutions.size() << endl;
+   /*
    for (int i = 0; i < solutions.size(); ++i)
    {
       cout << solutions[i] <<endl;
    }
-   pthread_exit(NULL);
-
+*/
   return 0;
 }
