@@ -127,14 +127,14 @@ int main( int argc, char* argv[]) {
   find_solution = false;
   omp_set_num_threads(cant_threads);
   // Inicio de los threads
-  TIMERSTART(start);
+  //TIMERSTART(start);
 
   #pragma omp for
     for(int i = 0; i < cant_threads; i++ ) {
       process_1D_row(i);     
    }
 
-   TIMERSTOP(start);
+   //TIMERSTOP(start);
 
    cout << solutions.size() << endl;
    saveSolutions(solutions,cant_threads);
