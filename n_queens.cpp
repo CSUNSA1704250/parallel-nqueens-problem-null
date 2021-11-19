@@ -12,6 +12,7 @@
 
 using namespace std;
 
+
 struct thread_data {
  int pos;
 };
@@ -39,6 +40,12 @@ bool cmdOptionExists(char** begin, char** end, const std::string& option)
 
 
 vector<string> solutions;
+ofstream file("solutions.txt");
+//file << solutions.size()<<"\n";
+
+
+
+
 
 void search(int y, vector<int> &solution, vector<bool> &col,vector<bool> &diag, vector<bool> &diag2)
 {
@@ -55,8 +62,8 @@ void search(int y, vector<int> &solution, vector<bool> &col,vector<bool> &diag, 
       if (i!=cant_threads-1) answer += to_string(solution[i]) + " ";
       else answer += to_string(solution[i]);
     }
-
-    solutions.push_back(answer);
+    file<<answer<<"\n";
+    //solutions.push_back(answer);
     find_solution = true;
     return;
   }
@@ -107,7 +114,7 @@ int main( int argc, char* argv[]) {
 
   //cant_threads = 7;
   cant_threads = stol(a);  
-
+  file << "#Solutions for " << cant_threads << " queens.\n";
   int rc;
 
   if(problema == "all")
@@ -127,17 +134,18 @@ int main( int argc, char* argv[]) {
   find_solution = false;
   omp_set_num_threads(cant_threads);
   // Inicio de los threads
-  //TIMERSTART(start);
+  TIMERSTART(start);
 
   #pragma omp for
+
     for(int i = 0; i < cant_threads; i++ ) {
       process_1D_row(i);     
    }
 
-   //TIMERSTOP(start);
+   TIMERSTOP(start);
 
-   cout << solutions.size() << endl;
-   saveSolutions(solutions,cant_threads);
+   //cout << solutions.size() << endl;
+   //saveSolutions(solutions,cant_threads);
    /*
    for (int i = 0; i < solutions.size(); ++i)
    {
